@@ -239,8 +239,8 @@ saveBehaviorBtn.addEventListener('click', () => {
         document.querySelector('.header h1').textContent = `${selectedChild}'s Token Rewards`;
     }
 
-     function loadData(child) {
-	console.log('apiUrl:', apiUrl);
+function loadData(child) {
+    console.log('apiUrl:', apiUrl);
     fetch(apiUrl, {
         headers: {
             'X-Master-Key': apiKey
@@ -248,17 +248,32 @@ saveBehaviorBtn.addEventListener('click', () => {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('API data:', data); // Log the API data
+
         if (data && data.record) {
+            console.log('Data record found');
+
             behaviors = data.record.behaviors || [];
             tokenCount = data.record.tokenCount || 0;
             activityLog = data.record.activityLog || [];
 
+            console.log('Behaviors:', behaviors);
+            console.log('Token count:', tokenCount);
+            console.log('Activity log:', activityLog);
+
             if (currentChild) {
+                console.log('Current child:', currentChild);
                 const childData = data.record.children.find(c => c.name === currentChild);
+                console.log('Child data:', childData);
+
                 if (childData) {
                     behaviors = childData.behaviors || [];
                     tokenCount = childData.tokenCount || 0;
                     activityLog = childData.activityLog || [];
+
+                    console.log('Child specific behaviors:', behaviors);
+                    console.log('Child specific token count:', tokenCount);
+                    console.log('Child specific activity log:', activityLog);
                 }
             }
 
@@ -268,8 +283,8 @@ saveBehaviorBtn.addEventListener('click', () => {
             updateTokenJar();
             updateRewardDisabledStates();
         } else {
-            // Handle empty data
-             behaviors = [];
+            console.log('No data record found');
+            behaviors = [];
             tokenCount = 0;
             activityLog = [];
             children = [];
