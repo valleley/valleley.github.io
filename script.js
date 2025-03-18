@@ -78,7 +78,7 @@ let selectedChild = localStorage.getItem('selectedChild') || 'Margaret';
     updateHeading(); 
     renderBehaviors();
     updateTokenJar();
-	
+	updateRewardDisabledStates()
     // --------------------------------------------------
     //  Event Listeners
     // --------------------------------------------------
@@ -397,7 +397,8 @@ function renderActivityLog() {
             }
             rewardList.appendChild(li);
         });
-	    updateRewardDisabledStates();
+	    	    updateRewardDisabledStates();
+
     }
  function handleRewardClick(event) {
         const li = event.target.closest('li');
@@ -409,8 +410,8 @@ function renderActivityLog() {
         tokenCount = Math.max(0, tokenCount - cost); // Prevent negative here
         updateTokenDisplay();
         logActivity(`Redeemed ${reward} for ${cost} tokens`, 'redemption');
-        updateRewardDisabledStates();
-        saveData(currentChild);
+updateRewardDisabledStates();
+	saveData(currentChild);
     }
 
    function updateRewardDisabledStates() {
@@ -626,6 +627,7 @@ function redeemReward(button) {
         tokenCount = count;
         console.log('Token count set to:', count); // Log the updated token count
         updateTokenJar(count);
+	updateRewardDisabledStates()
     }
 
     function updateTokenJar() {
