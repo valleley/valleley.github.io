@@ -297,10 +297,10 @@ function loadData(child) {
         }
     })
 	
-    .catch(error => {
-        console.error('Error loading data:', error);
-        console.log('Error object:', error);
-    });
+   // .catch(error => {
+//        console.error('Error loading data:', error);
+//        console.log('Error object:', error);
+//    });
 }
 
 
