@@ -247,34 +247,21 @@ function loadData(child) {
         }
     })
     .then(response => response.json())
-     .then(data => {
+    .then(data => {
         console.log('API data:', data);
-            if (data && data.record) {
-	    console.log('Child variable:', child); // Inspect child
-            console.log('Data record:', data.record); // Inspect data.record
+        if (data && data.record) {
+            console.log('Child variable:', child);
+            console.log('Data record:', data.record);
+
             behaviors = data.record.behaviors || [];
             tokenCount = data.record.tokenCount || 0;
-            activityLog = data.record[child].activityLog || []; // Access the child data.
-            console.log('activityLog:', activityLog); // Inspect the activityLog array
-            activityLog.forEach(log => console.log('Log entry:', log)); // Inspect each log entry
-            if(data.record.activityLog){
+
+            if (Array.isArray(data.record.activityLog)) {
                 activityLog = data.record.activityLog;
             } else {
                 activityLog = [];
             }
-            if (currentChild) {
-                let childData = data.record[currentChild];
-                console.log('Child data:', childData);
-                if (childData) {
-                    behaviors = childData.behaviors || [];
-                    tokenCount = childData.tokenCount || 0;
-                    if(childData.activityLog){
-                        activityLog = childData.activityLog;
-                    } else {
-                        activityLog = [];
-                    }
-                }
-            }
+
             renderBehaviors();
             updateTokenDisplay();
             renderActivityLog();
@@ -298,6 +285,11 @@ function loadData(child) {
             updateRewardDisabledStates();
         }
     })
+    .catch(error => {
+        console.error('Error loading data:', error);
+        console.log('Error object:', error);
+    });
+}
 	
    // .catch(error => {
 //        console.error('Error loading data:', error);
