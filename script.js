@@ -202,12 +202,13 @@ saveBehaviorBtn.addEventListener('click', () => {
 
 
 
-    clearLogBtn.addEventListener('click', () => {
-        localStorage.removeItem(`${currentChild}-activityLog`);
-        activityLog.innerHTML = '';
-        saveData(currentChild);
-        $(settingsModal).modal('hide');
-    });
+   clearLogBtn.addEventListener('click', () => {
+    // Remove localStorage usage:
+    activityLog = []; // Clear the in-memory array.
+    document.getElementById('activity-log').innerHTML = ''; //clear the html display.
+    saveData(currentChild); // Save the empty array to the API.
+    $(settingsModal).modal('hide');
+});
 
  document.getElementById('set-coin-btn').addEventListener('click', function () {
         const manualCoinInput = document.getElementById('manual-coin-input');
@@ -246,52 +247,52 @@ function loadData(child) {
             'X-Master-Key': apiKey
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('API data:', data);
-        if (data && data.record) {
-            console.log('Child variable:', child);
-            console.log('Data record:', data.record);
+        .then(response => response.json())
+        .then(data => {
+            console.log('API data:', data);
+            if (data && data.record) {
+                console.log('Child variable:', child);
+                console.log('Data record:', data.record);
 
-            behaviors = data.record.behaviors || [];
-            tokenCount = data.record.tokenCount || 0;
+                behaviors = data.record.behaviors || [];
+                tokenCount = data.record.tokenCount || 0;
 
-            if (Array.isArray(data.record.activityLog)) {
-                activityLog = data.record.activityLog;
-            } else {
-                activityLog = [];
-            }
-
-            renderBehaviors();
-            updateTokenDisplay();
-            renderActivityLog();
-            updateTokenJar();
-            updateRewardDisabledStates();
-        } else {
-            behaviors = [];
-            tokenCount = 0;
-            activityLog = [];
-            children = [];
-            if (currentChild) {
-                let newChild = { name: currentChild, behaviors: [], tokenCount: 0, activityLog: [] };
-                if (Array.isArray(children)) {
-                    children.push(newChild);
+                if (Array.isArray(data.record.activityLog)) {
+                    activityLog = data.record.activityLog;
+                } else {
+                    activityLog = [];
                 }
+
+                renderBehaviors();
+                updateTokenDisplay();
+                renderActivityLog();
+                updateTokenJar();
+                updateRewardDisabledStates();
+                renderRewards();
+            } else {
+                behaviors = [];
+                tokenCount = 0;
+                activityLog = [];
+                children = [];
+                if (currentChild) {
+                    let newChild = { name: currentChild, behaviors: [], tokenCount: 0, activityLog: [] };
+                    if (Array.isArray(children)) {
+                        children.push(newChild);
+                    }
+                }
+                renderBehaviors();
+                updateTokenDisplay();
+                renderActivityLog();
+                updateTokenJar();
+                updateRewardDisabledStates();
+                renderRewards();
             }
-            renderBehaviors();
-            updateTokenDisplay();
-            renderActivityLog();
-            updateTokenJar();
-            updateRewardDisabledStates();
-        }
-    })
-    .catch(error => {
-        console.error('Error loading data:', error);
-        console.log('Error object:', error);
-    });
+        })
+        .catch(error => {
+            console.error('Error loading data:', error);
+            console.log('Error object:', error);
+        });
 }
-
-
 
 function saveData(child) {
     let dataToSave = {
@@ -317,16 +318,38 @@ function saveData(child) {
         },
         body: JSON.stringify(dataToSave)
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Data saved:', data);
-    })
-    .catch(error => {
-        console.error('Error saving data:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            console.log('Data saved:', data);
+        })
+        .catch(error => {
+            console.error('Error saving data:', error);
+        });
 }
+function renderActivityLog(){
+    if(Array.isArray(activityLog)){
+        activityLog.forEach(log => {
+            const listItem = document.createElement('li');
+            listItem.textContent = log.message;
 
-
+            switch (log.type) {
+                case 'positive':
+                    listItem.style.color = 'green';
+                    break;
+                case 'negative':
+                    listItem.style.color = 'red';
+                    break;
+                case 'redemption':
+                    listItem.style.color = 'blue';
+                    break;
+                default:
+                    listItem.style.color = 'black';
+            }
+            activityLogElement = document.getElementById('activity-log');
+            activityLogElement.prepend(listItem);
+        })
+    }
+}
     function renderBehaviors() {
 		   console.log('Rendering behaviors:', behaviors); //
         positiveBehaviorList.innerHTML = '';
@@ -411,35 +434,35 @@ function saveData(child) {
     }
 
     function logActivity(message, type, tokens) {
-        const listItem = document.createElement('li');
-        const now = new Date();
-        const timestamp = now.toLocaleString();
-        const logMessage = `${timestamp}: ${message.replace('{tokens > 0 ? \'+\' : \'\'}{tokens}', tokens > 0 ? '+' + tokens : tokens)}`;
-        listItem.textContent = logMessage;
+    const listItem = document.createElement('li');
+    const now = new Date();
+    const timestamp = now.toLocaleString();
+    const logMessage = `${timestamp}: ${message.replace('{tokens > 0 ? \'+\' : \'\'}{tokens}', tokens > 0 ? '+' + tokens : tokens)}`;
+    listItem.textContent = logMessage;
 
-        switch (type) {
-            case 'positive':
-                listItem.style.color = 'green';
-                break;
-            case 'negative':
-                listItem.style.color = 'red';
-                break;
-            case 'redemption':
-                listItem.style.color = 'blue';
-                break;
-            default:
-                listItem.style.color = 'black';
-        }
-
-        activityLog.prepend(listItem);
-        activityLog.scrollTop = activityLog.scrollHeight;
-
-        let logs = JSON.parse(localStorage.getItem(`${currentChild}-activityLog`)) || [];
-        logs.push({ timestamp, message: logMessage, type });
-        localStorage.setItem(`${currentChild}-activityLog`, JSON.stringify(logs));
-
-        createDashboardContent();
+    switch (type) {
+        case 'positive':
+            listItem.style.color = 'green';
+            break;
+        case 'negative':
+            listItem.style.color = 'red';
+            break;
+        case 'redemption':
+            listItem.style.color = 'blue';
+            break;
+        default:
+            listItem.style.color = 'black';
     }
+
+    activityLog.prepend(listItem);
+    activityLog.scrollTop = activityLog.scrollHeight;
+
+    // Remove localStorage usage:
+    activityLog.push({ timestamp, message: logMessage, type }); // Append to the in-memory array.
+
+    createDashboardContent();
+    saveData(currentChild); // Save to the API
+}
 
 function clearData() {
     fetch(apiUrl, {
