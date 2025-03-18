@@ -544,7 +544,34 @@ function clearData() {
         dashboardData[child] = behaviorCounts;
         return dashboardData;
     }
+function redeemReward(button) {
+    console.log('Redeeming reward...'); // Debugging
+    const rewardName = button.textContent;
+    const rewardCost = parseInt(button.getAttribute('data-cost'));
+    console.log('Reward Name:', rewardName, 'Reward Cost:', rewardCost); // Debugging
 
+    if (tokenCount >= rewardCost) {
+        console.log('Token Count Before:', tokenCount); // Debugging
+        tokenCount -= rewardCost;
+        console.log('Token Count After:', tokenCount); // Debugging
+
+        updateTokenDisplay();
+        updateTokenJar();
+        updateRewardDisabledStates();
+
+        const message = `Redeemed ${rewardName} for ${rewardCost} tokens`;
+        logActivity(message, 'redemption', -rewardCost);
+        saveData(currentChild)
+            .then(() => {
+                console.log("Save successful after redeeming reward");
+            })
+            .catch((error) => {
+                console.error("Save failed after redeeming reward", error);
+            });
+    } else {
+        alert('Not enough tokens to redeem this reward.');
+    }
+}
     function createDashboardContent() {
         const dashboardData = generateDashboardData();
         const dashboardContent = document.getElementById('dashboard-content');
