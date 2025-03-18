@@ -229,11 +229,11 @@ saveBehaviorBtn.addEventListener('click', () => {
     // --------------------------------------------------
 
     function changeChild(child) {
-        saveData(currentChild).then(() => {
+        saveData(currentChild).then() => {
             currentChild = child;
             loadData(currentChild);
             createDashboardContent();
-			updateHeading();
+	    updateHeading();
         });
     }
 	    function updateHeading() {
@@ -422,14 +422,21 @@ function renderActivityLog(){
         saveData(currentChild);
     }
 
-    function updateRewardDisabledStates() {
-        rewardList.querySelectorAll('li').forEach(li => {
-            const cost = parseInt(li.dataset.cost);
-            const isDisabled = tokenCount < cost;
-            li.classList.toggle('disabled', isDisabled);
-        });
-    }
+   function updateRewardDisabledStates() {
+    const rewardButtons = document.querySelectorAll('.reward-button');
+    rewardButtons.forEach(button => {
+        const rewardCost = parseInt(button.getAttribute('data-cost'));
+        console.log('Token Count:', tokenCount, 'Reward Cost:', rewardCost); // Debugging
 
+        if (tokenCount >= rewardCost) {
+            button.disabled = false;
+            button.classList.remove('disabled');
+        } else {
+            button.disabled = true;
+            button.classList.add('disabled');
+        }
+    });
+}
     function updateTokenDisplay() {
         tokenDisplay.textContent = tokenCount;
     }
