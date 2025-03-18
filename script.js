@@ -272,6 +272,7 @@ saveBehaviorBtn.addEventListener('click', () => {
     }
 
    function loadData(child) {
+	console.log('apiUrl:', apiUrl);
     fetch(apiUrl, {
         headers: {
             'X-Master-Key': apiKey
