@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // --------------------------------------------------
 
     const tokenDisplay = document.getElementById('token-count');
-    const activityLog = document.getElementById('activity-log');
+    let activityLog = document.getElementById('activity-log');
     const positiveBehaviorList = document.getElementById('positive-behavior-list');
     const negativeBehaviorList = document.getElementById('negative-behavior-list');
     const coindumpBehaviorList = document.getElementById('coindump-behavior-list');
