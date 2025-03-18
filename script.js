@@ -247,21 +247,28 @@ function loadData(child) {
         }
     })
     .then(response => response.json())
-    .then(data => {
+     .then(data => {
         console.log('API data:', data);
         if (data && data.record) {
             behaviors = data.record.behaviors || [];
             tokenCount = data.record.tokenCount || 0;
             console.log('data.record.activityLog:', data.record.activityLog); // Inspect activityLog
-            activityLog = data.record.activityLog || [];
-            // activityLog = []; // temporary test.
+            if(data.record.activityLog){
+                activityLog = data.record.activityLog;
+            } else {
+                activityLog = [];
+            }
             if (currentChild) {
                 let childData = data.record[currentChild];
                 console.log('Child data:', childData);
                 if (childData) {
                     behaviors = childData.behaviors || [];
                     tokenCount = childData.tokenCount || 0;
-                    activityLog = childData.activityLog || [];
+                    if(childData.activityLog){
+                        activityLog = childData.activityLog;
+                    } else {
+                        activityLog = [];
+                    }
                 }
             }
             renderBehaviors();
@@ -287,6 +294,7 @@ function loadData(child) {
             updateRewardDisabledStates();
         }
     })
+	
     .catch(error => {
         console.error('Error loading data:', error);
         console.log('Error object:', error);
