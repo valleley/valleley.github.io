@@ -250,16 +250,16 @@ function loadData(child) {
         .then(response => response.json())
         .then(data => {
             console.log('API data:', data);
-            if (data && data.record) {
+            if (data && data[child]) { // Check if data[child] exists
                 console.log('Child variable:', child);
-                console.log('Data record:', data.record);
+                console.log('Data record:', data[child]);
 
-                behaviors = data.record.behaviors || [];
-                rewards = data.record.rewards || []; //add rewards assignment.
-                tokenCount = data.record.tokenCount || 0;
+                behaviors = data[child].behaviors || [];
+                rewards = data[child].rewards || [];
+                tokenCount = data[child].tokenCount || 0;
 
-                if (Array.isArray(data.record.activityLog)) {
-                    activityLog = data.record.activityLog;
+                if (Array.isArray(data[child].activityLog)) {
+                    activityLog = data[child].activityLog;
                 } else {
                     activityLog = [];
                 }
@@ -280,13 +280,7 @@ function loadData(child) {
                 rewards = [];
                 tokenCount = 0;
                 activityLog = [];
-                children = [];
-                if (currentChild) {
-                    let newChild = { name: currentChild, behaviors: [], tokenCount: 0, activityLog: [] };
-                    if (Array.isArray(children)) {
-                        children.push(newChild);
-                    }
-                }
+                //no need to change children array within the load data function.
                 renderBehaviors();
                 renderRewards();
                 renderActivityLog();
@@ -302,36 +296,41 @@ function loadData(child) {
 }
 
 function saveData(child) {
-    let dataToSave = {
-        behaviors: behaviors,
-        tokenCount: tokenCount,
-        activityLog: activityLog,
-        children: children
-    };
-    if (currentChild) {
-        const childIndex = children.findIndex(c => c.name === currentChild);
-        if (childIndex !== -1) {
-            children[childIndex].behaviors = behaviors;
-            children[childIndex].tokenCount = tokenCount;
-            children[childIndex].activityLog = activityLog;
-        }
-    }
-
     fetch(apiUrl, {
-        method: 'PUT',
         headers: {
-            'Content-Type': 'application/json',
             'X-Master-Key': apiKey
-        },
-        body: JSON.stringify(dataToSave)
+        }
     })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Data saved:', data);
-        })
-        .catch(error => {
-            console.error('Error saving data:', error);
-        });
+    .then(response => response.json())
+    .then(data => {
+        if(data){
+            data[child] = {
+                behaviors: behaviors,
+                tokenCount: tokenCount,
+                activityLog: activityLog,
+                rewards: rewards
+            };
+            fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': apiKey
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Data saved:', data);
+            })
+            .catch(error => {
+                console.error('Error saving data:', error);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error loading data:', error);
+        console.log('Error object:', error);
+    });
 }
 function renderActivityLog(){
     if(Array.isArray(activityLog)){
