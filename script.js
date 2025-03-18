@@ -250,20 +250,20 @@ function loadData(child) {
         .then(response => response.json())
         .then(data => {
             console.log('API data:', data);
-            if (data && data[child]) { // Check if data[child] exists
+            if (data && data.record && data.record[child]) { // Corrected check
                 console.log('Child variable:', child);
-                console.log('Data record:', data[child]);
+                console.log('Data record:', data.record[child]); // Corrected access
 
-                behaviors = data[child].behaviors || [];
-                rewards = data[child].rewards || [];
-                tokenCount = data[child].tokenCount || 0;
+                behaviors = data.record[child].behaviors || []; // Corrected access
+                rewards = data.record[child].rewards || []; // Corrected access
+                tokenCount = data.record[child].tokenCount || 0; // Corrected access
 
-                if (Array.isArray(data[child].activityLog)) {
-                    activityLog = data[child].activityLog;
+                if (Array.isArray(data.record[child].activityLog)) { // Corrected access
+                    activityLog = data.record[child].activityLog; // Corrected access
                 } else {
                     activityLog = [];
                 }
-
+		console.log('Token:', tokenCount); // Debugging
                 console.log('Behaviors:', behaviors); // Debugging
                 console.log('Rewards:', rewards); // Debugging
                 console.log('Activity Log:', activityLog); // Debugging
