@@ -62,26 +62,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
   
    // --------------------------------------------------
-    //  Data and State
-    // --------------------------------------------------
+   //  Data and State  
+   // --------------------------------------------------
 
-    let currentChild = 'margaret'; // Initialize with a default child
-    let tokenCount = 0;
-    let behaviors = [];
-    let rewards = [];
-	let children = [];
-    let tokenCounterClicks = 0;
-	let selectedChild = localStorage.getItem('selectedChild') || 'Margaret'; // Default to Margaret
+let currentChild = 'margaret';
+let tokenCount = 0;
+let behaviors = [];
+let rewards = [];
+let children = [];
+let tokenCounterClicks = 0;
+let selectedChild = localStorage.getItem('selectedChild') || 'Margaret';
     // --------------------------------------------------
     //  Initialization
     // --------------------------------------------------
-
+	
     // Load initial data
     loadData(currentChild);
     createDashboardContent();
-	updateHeading();
-	renderBehaviors();
+    updateHeading(); 
+    renderBehaviors();
     updateTokenJar();
+	
     // --------------------------------------------------
     //  Event Listeners
     // --------------------------------------------------
