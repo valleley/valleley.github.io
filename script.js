@@ -255,6 +255,7 @@ function loadData(child) {
                 console.log('Data record:', data.record);
 
                 behaviors = data.record.behaviors || [];
+                rewards = data.record.rewards || []; //add rewards assignment.
                 tokenCount = data.record.tokenCount || 0;
 
                 if (Array.isArray(data.record.activityLog)) {
@@ -263,14 +264,20 @@ function loadData(child) {
                     activityLog = [];
                 }
 
+                console.log('Behaviors:', behaviors); // Debugging
+                console.log('Rewards:', rewards); // Debugging
+                console.log('Activity Log:', activityLog); // Debugging
+
                 renderBehaviors();
-                updateTokenDisplay();
+                renderRewards();
                 renderActivityLog();
+                updateTokenDisplay();
                 updateTokenJar();
                 updateRewardDisabledStates();
-                renderRewards();
+
             } else {
                 behaviors = [];
+                rewards = [];
                 tokenCount = 0;
                 activityLog = [];
                 children = [];
@@ -281,11 +288,11 @@ function loadData(child) {
                     }
                 }
                 renderBehaviors();
-                updateTokenDisplay();
+                renderRewards();
                 renderActivityLog();
+                updateTokenDisplay();
                 updateTokenJar();
                 updateRewardDisabledStates();
-                renderRewards();
             }
         })
         .catch(error => {
