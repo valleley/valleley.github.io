@@ -229,7 +229,7 @@ saveBehaviorBtn.addEventListener('click', () => {
     // --------------------------------------------------
 
     function changeChild(child) {
-        saveData(currentChild).then() => {
+        saveData(currentChild).then()) => {
             currentChild = child;
             loadData(currentChild);
             createDashboardContent();
