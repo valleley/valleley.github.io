@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const cancelRewardBtn = document.getElementById('cancel-reward-btn');
     const newRewardName = document.getElementById('new-reward-name');
     const newRewardCost = document.getElementById('new-reward-cost');
-    const dashboardTabButton = document.querySelector('.tab[onclick="showTab(\'dashboard\')"]');
+//    const dashboardTabButton = document.querySelector('.tab[onclick="showTab(\'dashboard\')"]');
     const toggleJarBtn = document.getElementById('toggle-jar-btn');
     const clearLogBtn = document.getElementById('clear-log-btn');
     const manualCoinInput = document.getElementById('manual-coin-input');
@@ -74,7 +74,7 @@ let selectedChild = localStorage.getItem('selectedChild') || 'Margaret';
 	
     // Load initial data
     loadData(currentChild);
-    createDashboardContent();
+//    createDashboardContent();
     updateHeading(); 
     renderBehaviors();
     updateTokenJar();
@@ -179,11 +179,11 @@ saveBehaviorBtn.addEventListener('click', () => {
         newRewardForm.style.display = 'none';
     });
 
-    if (dashboardTabButton) {
-        dashboardTabButton.addEventListener('click', createDashboardContent);
-    } else {
-        console.error("Dashboard tab button not found. Check your HTML.");
-    }
+//    if (dashboardTabButton) {
+//        dashboardTabButton.addEventListener('click', createDashboardContent);
+//    } else {
+//        console.error("Dashboard tab button not found. Check your HTML.");
+//    }
 
     // Attach event listener using event delegation for rewards
     rewardList.addEventListener('click', handleRewardClick);
@@ -228,7 +228,7 @@ saveBehaviorBtn.addEventListener('click', () => {
         saveData(currentChild).then(() => {
             currentChild = child;
             loadData(currentChild);
-            createDashboardContent();
+   //         createDashboardContent();
 	    updateHeading();
         });
     }
@@ -474,7 +474,7 @@ updateRewardDisabledStates();
 
         activityLog.push({ timestamp, message: logMessage, type });
 
-        createDashboardContent();
+   //     createDashboardContent();
         saveData(currentChild)
             .then(() => {
                 console.log("Save successful after log activity");
@@ -517,14 +517,13 @@ function clearData() {
 }
     function generateDashboardData() {
         const dashboardData = {};
+       const child = currentChild;
 
-        const child = currentChild;
+      const logs = JSON.parse(localStorage.getItem(`${child}-activityLog`)) || [];
+       const behaviorCounts = { positive: 0, negative: 0, coindump: 0, rewards: 0 };
 
-        const logs = JSON.parse(localStorage.getItem(`${child}-activityLog`)) || [];
-        const behaviorCounts = { positive: 0, negative: 0, coindump: 0, rewards: 0 };
-
-        logs.forEach(log => {
-            switch (log.type) {
+       logs.forEach(log => {
+           switch (log.type) {
                 case 'positive':
                     behaviorCounts.positive++;
                     break;
