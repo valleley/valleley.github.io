@@ -249,10 +249,12 @@ function loadData(child) {
     .then(response => response.json())
      .then(data => {
         console.log('API data:', data);
-        if (data && data.record) {
+            if (data && data.record) {
             behaviors = data.record.behaviors || [];
             tokenCount = data.record.tokenCount || 0;
-            console.log('data.record.activityLog:', data.record.activityLog); // Inspect activityLog
+            activityLog = data.record[child].activityLog || []; // Access the child data.
+            console.log('activityLog:', activityLog); // Inspect the activityLog array
+            activityLog.forEach(log => console.log('Log entry:', log)); // Inspect each log entry
             if(data.record.activityLog){
                 activityLog = data.record.activityLog;
             } else {
