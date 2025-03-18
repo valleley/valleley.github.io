@@ -381,25 +381,24 @@ function renderActivityLog() {
         });
     }
 
-    function renderRewards() {
-        rewardList.innerHTML = '';
-        rewards.forEach(reward => {
-            const li = document.createElement('li');
-            const disabled = tokenCount < reward.cost;
-            li.innerHTML = `<span>🎁 ${reward.name} (${reward.cost} tokens)</span>`;
-            li.dataset.cost = reward.cost;
-            li.dataset.reward = reward.name;
-            li.classList.add('clickable-line');
-            if (disabled) {
-                li.classList.add('disabled');
-            } else {
-                li.classList.remove('disabled');
-            }
-            rewardList.appendChild(li);
-        });
-	    	    updateRewardDisabledStates();
-
-    }
+ function renderRewards() {
+    rewardList.innerHTML = '';
+    rewards.forEach(reward => {
+        const li = document.createElement('li');
+        const disabled = tokenCount < reward.cost;
+        li.innerHTML = `<span>🎁 ${reward.name} (${reward.cost} tokens)</span>`;
+        li.dataset.cost = reward.cost;
+        li.dataset.reward = reward.name;
+        li.classList.add('clickable-line');
+        if (disabled) {
+            li.classList.add('disabled');
+        } else {
+            li.classList.remove('disabled');
+        }
+        rewardList.appendChild(li);
+    });
+    updateRewardDisabledStates();
+}
  function handleRewardClick(event) {
         const li = event.target.closest('li');
         if (!li || li.classList.contains('disabled')) return;
@@ -414,21 +413,20 @@ updateRewardDisabledStates();
 	saveData(currentChild);
     }
 
-   function updateRewardDisabledStates() {
-    const rewardButtons = document.querySelectorAll('.reward-button');
-    rewardButtons.forEach(button => {
-        const rewardCost = parseInt(button.getAttribute('data-cost'));
+  function updateRewardDisabledStates() {
+    const rewardItems = rewardList.querySelectorAll('li[data-cost]'); // Select list items with data-cost
+    rewardItems.forEach(item => {
+        const rewardCost = parseInt(item.dataset.cost);
         console.log('Token Count:', tokenCount, 'Reward Cost:', rewardCost); // Debugging
 
         if (tokenCount >= rewardCost) {
-            button.disabled = false;
-            button.classList.remove('disabled');
+            item.classList.remove('disabled');
         } else {
-            button.disabled = true;
-            button.classList.add('disabled');
+            item.classList.add('disabled');
         }
     });
 }
+	
     function updateTokenDisplay() {
         tokenDisplay.textContent = tokenCount;
     }
@@ -541,34 +539,7 @@ function clearData() {
         dashboardData[child] = behaviorCounts;
         return dashboardData;
     }
-function redeemReward(button) {
-    console.log('Redeeming reward...'); // Debugging
-    const rewardName = button.textContent;
-    const rewardCost = parseInt(button.getAttribute('data-cost'));
-    console.log('Reward Name:', rewardName, 'Reward Cost:', rewardCost); // Debugging
 
-    if (tokenCount >= rewardCost) {
-        console.log('Token Count Before:', tokenCount); // Debugging
-        tokenCount -= rewardCost;
-        console.log('Token Count After:', tokenCount); // Debugging
-
-        updateTokenDisplay();
-        updateTokenJar();
-        updateRewardDisabledStates();
-
-        const message = `Redeemed ${rewardName} for ${rewardCost} tokens`;
-        logActivity(message, 'redemption', -rewardCost);
-        saveData(currentChild)
-            .then(() => {
-                console.log("Save successful after redeeming reward");
-            })
-            .catch((error) => {
-                console.error("Save failed after redeeming reward", error);
-            });
-    } else {
-        alert('Not enough tokens to redeem this reward.');
-    }
-}
     function createDashboardContent() {
         const dashboardData = generateDashboardData();
         const dashboardContent = document.getElementById('dashboard-content');
