@@ -290,12 +290,7 @@ function loadData(child) {
         console.log('Error object:', error);
     });
 }
-	
-   // .catch(error => {
-//        console.error('Error loading data:', error);
-//        console.log('Error object:', error);
-//    });
-}
+
 
 
 function saveData(child) {
