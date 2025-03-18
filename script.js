@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // --------------------------------------------------
 
     const tokenDisplay = document.getElementById('token-count');
-    let activityLog = document.getElementById('activity-log');
+   let activityLog = []; // Array for log data
+    let activityLogElement = document.getElementById('activity-log'); // DOM element
     const positiveBehaviorList = document.getElementById('positive-behavior-list');
     const negativeBehaviorList = document.getElementById('negative-behavior-list');
     const coindumpBehaviorList = document.getElementById('coindump-behavior-list');
@@ -327,30 +328,31 @@ function saveData(child) {
         console.log('Error object:', error);
     });
 }
-function renderActivityLog(){
-    if(Array.isArray(activityLog)){
-        activityLog.forEach(log => {
-            const listItem = document.createElement('li');
-            listItem.textContent = log.message;
+function renderActivityLog() {
+        if (Array.isArray(activityLog)) {
+            activityLogElement.innerHTML = ''; // Clear the list before rendering
+            activityLog.forEach(log => {
+                const listItem = document.createElement('li');
+                listItem.textContent = log.message;
 
-            switch (log.type) {
-                case 'positive':
-                    listItem.style.color = 'green';
-                    break;
-                case 'negative':
-                    listItem.style.color = 'red';
-                    break;
-                case 'redemption':
-                    listItem.style.color = 'blue';
-                    break;
-                default:
-                    listItem.style.color = 'black';
-            }
-        
-            activityLog.prepend(listItem);
-        })
+                switch (log.type) {
+                    case 'positive':
+                        listItem.style.color = 'green';
+                        break;
+                    case 'negative':
+                        listItem.style.color = 'red';
+                        break;
+                    case 'redemption':
+                        listItem.style.color = 'blue';
+                        break;
+                    default:
+                        listItem.style.color = 'black';
+                }
+
+                activityLogElement.prepend(listItem); // Use the DOM element
+            });
+        }
     }
-}
     function renderBehaviors() {
 		   console.log('Rendering behaviors:', behaviors); //
         positiveBehaviorList.innerHTML = '';
@@ -407,7 +409,7 @@ function renderActivityLog(){
         const li = event.target.closest('li');
         if (!li || li.classList.contains('disabled')) return;
 
-        const cost = parseInt(li.dataset.cost);
+        const cost = parseInt(li.dataset.cost); 
         const reward = li.dataset.reward;
 
         tokenCount = Math.max(0, tokenCount - cost); // Prevent negative here
@@ -454,40 +456,40 @@ function renderActivityLog(){
     saveData(currentChild);
 }
 
-function logActivity(message, type, tokens) {
-    const listItem = document.createElement('li');
-    const now = new Date();
-    const timestamp = now.toLocaleString();
-    const logMessage = `${timestamp}: ${message.replace('{tokens > 0 ? \'+\' : \'\'}{tokens}', tokens > 0 ? '+' + tokens : tokens)}`;
-    listItem.textContent = logMessage;
+    function logActivity(message, type, tokens) {
+        const listItem = document.createElement('li');
+        const now = new Date();
+        const timestamp = now.toLocaleString();
+        const logMessage = `${timestamp}: ${message.replace('{tokens > 0 ? \'+\' : \'\'}{tokens}', tokens > 0 ? '+' + tokens : tokens)}`;
+        listItem.textContent = logMessage;
 
-    switch (type) {
-        case 'positive':
-            listItem.style.color = 'green';
-            break;
-        case 'negative':
-            listItem.style.color = 'red';
-            break;
-        case 'redemption':
-            listItem.style.color = 'blue';
-            break;
-        default:
-            listItem.style.color = 'black';
+        switch (type) {
+            case 'positive':
+                listItem.style.color = 'green';
+                break;
+            case 'negative':
+                listItem.style.color = 'red';
+                break;
+            case 'redemption':
+                listItem.style.color = 'blue';
+                break;
+            default:
+                listItem.style.color = 'black';
+        }
+
+        activityLogElement.prepend(listItem); // Use the DOM element
+
+        activityLog.push({ timestamp, message: logMessage, type });
+
+        createDashboardContent();
+        saveData(currentChild)
+            .then(() => {
+                console.log("Save successful after log activity");
+            })
+            .catch((error) => {
+                console.error("Save failed after log activity", error);
+            });
     }
-
-    activityLogElement.prepend(listItem); // Now accessible
-
-    activityLog.push({ timestamp, message: logMessage, type });
-
-    createDashboardContent();
-    saveData(currentChild)
-        .then(() => {
-            console.log("Save successful after log activity");
-        })
-        .catch((error) => {
-            console.error("Save failed after log activity", error);
-        });
-}
 
 
 function clearData() {
@@ -520,7 +522,6 @@ function clearData() {
         }
     });
 }
-
     function generateDashboardData() {
         const dashboardData = {};
 
