@@ -248,49 +248,35 @@ function loadData(child) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('API data:', data); // Log the API data
-
+        console.log('API data:', data);
         if (data && data.record) {
-            console.log('Data record found');
-
             behaviors = data.record.behaviors || [];
             tokenCount = data.record.tokenCount || 0;
+            console.log('data.record.activityLog:', data.record.activityLog); // Inspect activityLog
             activityLog = data.record.activityLog || [];
-
-            console.log('Behaviors:', behaviors);
-            console.log('Token count:', tokenCount);
-            console.log('Activity log:', activityLog);
-
+            // activityLog = []; // temporary test.
             if (currentChild) {
-                console.log('Current child:', currentChild);
-                let childData = data.record.children.find(c => c.name === currentChild);
+                let childData = data.record[currentChild];
                 console.log('Child data:', childData);
-
                 if (childData) {
                     behaviors = childData.behaviors || [];
                     tokenCount = childData.tokenCount || 0;
                     activityLog = childData.activityLog || [];
-
-                    console.log('Child specific behaviors:', behaviors);
-                    console.log('Child specific token count:', tokenCount);
-                    console.log('Child specific activity log:', activityLog);
                 }
             }
-
             renderBehaviors();
             updateTokenDisplay();
             renderActivityLog();
             updateTokenJar();
             updateRewardDisabledStates();
         } else {
-            console.log('No data record found');
             behaviors = [];
             tokenCount = 0;
             activityLog = [];
             children = [];
-            if(currentChild){
-                let newChild = {name: currentChild, behaviors:[], tokenCount:0, activityLog:[]}
-                if(Array.isArray(children)){
+            if (currentChild) {
+                let newChild = { name: currentChild, behaviors: [], tokenCount: 0, activityLog: [] };
+                if (Array.isArray(children)) {
                     children.push(newChild);
                 }
             }
@@ -303,7 +289,7 @@ function loadData(child) {
     })
     .catch(error => {
         console.error('Error loading data:', error);
-        console.log('Error object:', error); // Log the error object
+        console.log('Error object:', error);
     });
 }
 
