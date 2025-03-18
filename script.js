@@ -292,40 +292,33 @@ function loadData(child) {
 }
 
 function saveData(child) {
-    fetch(apiUrl, {
+    return fetch(apiUrl, { // Return the fetch promise
         headers: {
             'X-Master-Key': apiKey
         }
     })
     .then(response => response.json())
     .then(data => {
-        if(data){
-            data[child] = {
+        if (data && data.record) { // Check if data and data.record exist
+            data.record[child] = {
                 behaviors: behaviors,
                 tokenCount: tokenCount,
                 activityLog: activityLog,
                 rewards: rewards
             };
-            fetch(apiUrl, {
+            return fetch(apiUrl, { // Return the fetch promise
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Master-Key': apiKey
                 },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Data saved:', data);
-            })
-            .catch(error => {
-                console.error('Error saving data:', error);
+                body: JSON.stringify(data.record)
             });
+        } else {
+            // Handle the case where data or data.record is missing
+            console.error("Data or data.record is missing from API response.");
+            return Promise.reject("Data or data.record is missing."); // Return a rejected promise
         }
-    })
-    .catch(error => {
-        console.error('Error loading data:', error);
-        console.log('Error object:', error);
     });
 }
 function renderActivityLog() {
@@ -404,6 +397,7 @@ function renderActivityLog() {
             }
             rewardList.appendChild(li);
         });
+	    updateRewardDisabledStates();
     }
  function handleRewardClick(event) {
         const li = event.target.closest('li');
