@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let tokenCount = 0;
     let behaviors = [];
     let rewards = [];
+	let children = [];
     let tokenCounterClicks = 0;
 	let selectedChild = localStorage.getItem('selectedChild') || 'Margaret'; // Default to Margaret
     // --------------------------------------------------
@@ -237,41 +238,7 @@ saveBehaviorBtn.addEventListener('click', () => {
         document.querySelector('.header h1').textContent = `${selectedChild}'s Token Rewards`;
     }
 
-    function loadDefaultData(child) {
-        const defaultData = {
-            tokenCount: 0,
-            behaviors: [
-                { name: "Morning Routine", value: 5, type: "positive" },
-                { name: "Completed Homework", value: 4, type: "positive" },
-                { name: "Helped with Chores", value: 3, type: "positive" },
-                { name: "Positive Attitude", value: 2, type: "positive" },
-                { name: "Good Listening", value: 2, type: "positive" },
-                { name: "Disrespectful Language", value: -2, type: "negative" },
-                { name: "Unfinished Chores", value: -1, type: "negative" },
-                { name: "Interrupted Others", value: -1, type: "negative" },
-                { name: "Major Tantrum", value: -10, type: "coindump" },
-                { name: "Hitting/Kicking", value: -15, type: "coindump" }
-            ],
-            rewards: [
-                { name: "Extra Screen Time (30 min)", cost: 15 },
-                { name: "Movie Night", cost: 25 },
-                { name: "Favorite Snack", cost: 10 },
-                { name: "Trip to the Park", cost: 30 },
-                { name: "New Toy/Book", cost: 40 },
-                { name: "Stay up Later (30 min)", cost: 20 }
-            ],
-            activityLog: []
-        };
-        fetch('/data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ [child]: defaultData })
-        }).then(() => loadData(child));
-    }
-
-   function loadData(child) {
+     function loadData(child) {
 	console.log('apiUrl:', apiUrl);
     fetch(apiUrl, {
         headers: {
@@ -322,7 +289,7 @@ saveBehaviorBtn.addEventListener('click', () => {
 }
 
 
-   function saveData(child) {
+function saveData(child) {
     let dataToSave = {
         behaviors: behaviors,
         tokenCount: tokenCount,
@@ -335,12 +302,6 @@ saveBehaviorBtn.addEventListener('click', () => {
             children[childIndex].behaviors = behaviors;
             children[childIndex].tokenCount = tokenCount;
             children[childIndex].activityLog = activityLog;
-            dataToSave = {
-                behaviors: allBehaviors,
-                tokenCount: allTokenCount,
-                activityLog: allActivityLog,
-                children: children
-            };
         }
     }
 
@@ -360,7 +321,6 @@ saveBehaviorBtn.addEventListener('click', () => {
         console.error('Error saving data:', error);
     });
 }
-
 
 
     function renderBehaviors() {
@@ -477,28 +437,36 @@ saveBehaviorBtn.addEventListener('click', () => {
         createDashboardContent();
     }
 
-    function clearData() {
-        fetch('http://192.168.1.45:3000/data')
-            .then(response => response.json())
-            .then(data => {
-                if (data[currentChild]) {
-                    delete data[currentChild];
-                    fetch('/data', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    }).then(() => {
-                        tokenCount = 0;
-                        updateTokenDisplay();
-                        renderBehaviors();
-                        renderRewards();
-                        alert('All data for ' + currentChild + ' has been cleared.');
-                    });
-                }
-            });
-    }
+function clearData() {
+    fetch(apiUrl, {
+        headers: {
+            'X-Master-Key': apiKey
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.record && data.record.children) {
+            const childIndex = data.record.children.findIndex(c => c.name === currentChild);
+            if (childIndex !== -1) {
+                data.record.children.splice(childIndex, 1);
+                fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': apiKey
+                    },
+                    body: JSON.stringify(data.record)
+                }).then(() => {
+                    tokenCount = 0;
+                    updateTokenDisplay();
+                    renderBehaviors();
+                    renderRewards();
+                    alert('All data for ' + currentChild + ' has been cleared.');
+                });
+            }
+        }
+    });
+}
 
     function generateDashboardData() {
         const dashboardData = {};
