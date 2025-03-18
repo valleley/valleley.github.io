@@ -283,6 +283,7 @@ saveBehaviorBtn.addEventListener('click', () => {
             behaviors = data.record.behaviors || [];
             tokenCount = data.record.tokenCount || 0;
             activityLog = data.record.activityLog || [];
+
             if (currentChild) {
                 const childData = data.record.children.find(c => c.name === currentChild);
                 if (childData) {
@@ -291,13 +292,27 @@ saveBehaviorBtn.addEventListener('click', () => {
                     activityLog = childData.activityLog || [];
                 }
             }
+
             renderBehaviors();
             updateTokenDisplay();
             renderActivityLog();
             updateTokenJar();
             updateRewardDisabledStates();
         } else {
-            console.error('Invalid data format from JSONBin.io');
+            // Handle empty data
+            behaviors = [];
+            tokenCount = 0;
+            activityLog = [];
+            children = [];
+            if(currentChild){
+                let newChild = {name: currentChild, behaviors:[], tokenCount:0, activityLog:[]}
+                children.push(newChild);
+            }
+            renderBehaviors();
+            updateTokenDisplay();
+            renderActivityLog();
+            updateTokenJar();
+            updateRewardDisabledStates();
         }
     })
     .catch(error => {
