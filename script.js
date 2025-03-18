@@ -46,15 +46,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggleJarBtn = document.getElementById('toggle-jar-btn');
     const clearLogBtn = document.getElementById('clear-log-btn');
     const manualCoinInput = document.getElementById('manual-coin-input');
-    const setCoinBtn = document.getElementById('set-coin-btn');
-	const userSelectButtons = document.querySelectorAll('#user-select .btn');
+    const setCoinBtn = document.getElementById('set-coin-btn'); 
+    const userSelectButtons = document.querySelectorAll('#user-select .btn');
  
-    const hamburgerMenu = document.getElementById('hamburger-menu');
-    const sidenav = document.getElementById('sidenav');
-    const closeSidenav = document.getElementById('close-sidenav');
-    const appContainer = document.getElementById('app-container');
-	
-	const binId = '67d980a18a456b7966786fd4'; // Replace with your bin ID
+   	const binId = '67d980a18a456b7966786fd4'; // Replace with your bin ID
 	const apiKey = '$2a$10$X5Qc9AS17LVgJPMzQWkaTeAGpfrUD7gzUBoVHRY2z6HiaZd1o7.t6'; // Replace with your API key
 	const apiUrl = `https://api.jsonbin.io/v3/b/${binId}`;
    
@@ -351,8 +346,8 @@ function renderActivityLog(){
                 default:
                     listItem.style.color = 'black';
             }
-            activityLogElement = document.getElementById('activity-log');
-            activityLogElement.prepend(listItem);
+        
+            activityLog.prepend(listItem);
         })
     }
 }
@@ -480,14 +475,20 @@ function logActivity(message, type, tokens) {
             listItem.style.color = 'black';
     }
 
-    activityLogElement.prepend(listItem);
+    activityLogElement.prepend(listItem); // Now accessible
 
     activityLog.push({ timestamp, message: logMessage, type });
-    console.log('Log activity:', logMessage, type); //debugging
 
     createDashboardContent();
-    saveData(currentChild);
+    saveData(currentChild)
+        .then(() => {
+            console.log("Save successful after log activity");
+        })
+        .catch((error) => {
+            console.error("Save failed after log activity", error);
+        });
 }
+
 
 function clearData() {
     fetch(apiUrl, {
