@@ -268,13 +268,15 @@ saveBehaviorBtn.addEventListener('click', () => {
             updateRewardDisabledStates();
         } else {
             // Handle empty data
-            behaviors = [];
+             behaviors = [];
             tokenCount = 0;
             activityLog = [];
             children = [];
             if(currentChild){
                 let newChild = {name: currentChild, behaviors:[], tokenCount:0, activityLog:[]}
-                children.push(newChild);
+                if(Array.isArray(children)){
+                    children.push(newChild);
+                }
             }
             renderBehaviors();
             updateTokenDisplay();
