@@ -263,7 +263,7 @@ function loadData(child) {
 
             if (currentChild) {
                 console.log('Current child:', currentChild);
-                const childData = data.record.children.find(c => c.name === currentChild);
+                let childData = data.record.children.find(c => c.name === currentChild);
                 console.log('Child data:', childData);
 
                 if (childData) {
