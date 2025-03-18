@@ -250,6 +250,8 @@ function loadData(child) {
      .then(data => {
         console.log('API data:', data);
             if (data && data.record) {
+	    console.log('Child variable:', child); // Inspect child
+            console.log('Data record:', data.record); // Inspect data.record
             behaviors = data.record.behaviors || [];
             tokenCount = data.record.tokenCount || 0;
             activityLog = data.record[child].activityLog || []; // Access the child data.
