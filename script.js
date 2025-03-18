@@ -446,7 +446,20 @@ function renderActivityLog(){
         logContainer.classList.toggle("active");
     }
 
-    function logActivity(message, type, tokens) {
+ function addBehavior(behaviorName, behaviorValue, behaviorType) {
+    tokenCount += behaviorValue;
+    updateTokenDisplay();
+    updateTokenJar();
+    updateRewardDisabledStates();
+
+    let message = `${behaviorName}: ${behaviorValue > 0 ? '+' : ''}${behaviorValue} tokens`;
+    console.log('Adding behavior:', message, behaviorType); // Debugging
+
+    logActivity(message, behaviorType, behaviorValue);
+    saveData(currentChild);
+}
+
+function logActivity(message, type, tokens) {
     const listItem = document.createElement('li');
     const now = new Date();
     const timestamp = now.toLocaleString();
@@ -467,14 +480,13 @@ function renderActivityLog(){
             listItem.style.color = 'black';
     }
 
-    activityLog.prepend(listItem);
-    activityLog.scrollTop = activityLog.scrollHeight;
+    activityLogElement.prepend(listItem);
 
-    // Remove localStorage usage:
-    activityLog.push({ timestamp, message: logMessage, type }); // Append to the in-memory array.
+    activityLog.push({ timestamp, message: logMessage, type });
+    console.log('Log activity:', logMessage, type); //debugging
 
     createDashboardContent();
-    saveData(currentChild); // Save to the API
+    saveData(currentChild);
 }
 
 function clearData() {
