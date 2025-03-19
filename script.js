@@ -79,6 +79,7 @@ let selectedChild = localStorage.getItem('selectedChild') || 'Margaret';
     renderBehaviors();
     updateTokenJar();
 	updateRewardDisabledStates()
+	addFilteringControls();
     // --------------------------------------------------
     //  Event Listeners
     // --------------------------------------------------
@@ -346,40 +347,33 @@ function renderActivityLog() {
             });
         }
     }
-    function renderBehaviors() {
-		   console.log('Rendering behaviors:', behaviors); //
-        positiveBehaviorList.innerHTML = '';
-        negativeBehaviorList.innerHTML = '';
-        coindumpBehaviorList.innerHTML = '';
+   function renderBehaviors() {
+    const container = document.getElementById('behavior-cards-container');
+    container.innerHTML = ''; // Clear existing cards
 
-        behaviors.forEach(behavior => {
-            const emoji = behavior.type === 'positive' ? '🌟' : behavior.type === 'negative' ? '⚠️' : '❗';
-            const li = document.createElement('li');
+    behaviors.forEach(behavior => {
+        const card = document.createElement('div');
+        card.classList.add('behavior-card', behavior.type); // Add type as a class for styling
+        card.innerHTML = `
+            <h3>${behavior.name}</h3>
+            <span class="behavior-value">${behavior.value} tokens</span>
+        `;
 
-            li.innerHTML = `<span>${emoji} ${behavior.name} (${behavior.value})</span>`;
-            li.dataset.tokens = behavior.value;
-            li.dataset.behavior = behavior.name;
-            li.classList.add('clickable-line');
-
-             li.addEventListener('click', function () {
-            const tokens = parseInt(this.dataset.tokens);
-            const behavior = this.dataset.behavior;
-            const message = `${behavior}: ${tokens > 0 ? '+' : ''}${tokens} tokens`;
-
-            tokenCount = Math.max(0, tokenCount + tokens); // Prevent negative here
+        // Add event listener for behavior click
+        card.addEventListener('click', () => {
+            const tokens = parseInt(behavior.value);
+            const message = `${behavior.name}: ${tokens > 0 ? '+' : ''}${tokens} tokens`;
+            tokenCount = Math.max(0, tokenCount + tokens);
             updateTokenDisplay();
             updateTokenJar();
-            const type = tokens > 0 ? 'positive' : 'negative';
-            logActivity(message, type);
+            logActivity(message, behavior.type);
             updateRewardDisabledStates();
             saveData(currentChild);
         });
 
-            if (behavior.type === 'positive') positiveBehaviorList.appendChild(li);
-            else if (behavior.type === 'negative') negativeBehaviorList.appendChild(li);
-            else coindumpBehaviorList.appendChild(li);
-        });
-    }
+        container.appendChild(card);
+    });
+   }
 
  function renderRewards() {
     rewardList.innerHTML = '';
@@ -399,6 +393,37 @@ function renderActivityLog() {
     });
     updateRewardDisabledStates();
 }
+function addFilteringControls() {
+    // Example: Add a dropdown to filter by behavior type
+    const filterDropdown = document.createElement('select');
+    filterDropdown.innerHTML = `
+        <option value="">All</option>
+        <option value="positive">Positive</option>
+        <option value="negative">Negative</option>
+        <option value="coindump">Coindump</option>
+    `;
+
+    filterDropdown.addEventListener('change', (e) => {
+        const selectedType = e.target.value;
+        filterBehaviors(selectedType);
+    });
+
+    // Add the dropdown to your container (e.g., before the cards)
+    document.getElementById('behaviors-section').prepend(filterDropdown);
+}
+
+function filterBehaviors(type) {
+    const cards = document.querySelectorAll('.behavior-card');
+    cards.forEach(card => {
+        if (type === '' || card.classList.contains(type)) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+	
  function handleRewardClick(event) {
         const li = event.target.closest('li');
         if (!li || li.classList.contains('disabled')) return;
