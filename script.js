@@ -375,24 +375,48 @@ function renderActivityLog() {
     });
    }
 
- function renderRewards() {
-    rewardList.innerHTML = '';
+   function renderRewards() {
+    const container = document.getElementById('reward-cards-container'); // Assuming you have a container for rewards
+    container.innerHTML = '';
+  
     rewards.forEach(reward => {
-        const li = document.createElement('li');
-        const disabled = tokenCount < reward.cost;
-        li.innerHTML = `<span>🎁 ${reward.name} (${reward.cost} tokens)</span>`;
-        li.dataset.cost = reward.cost;
-        li.dataset.reward = reward.name;
-        li.classList.add('clickable-line');
-        if (disabled) {
-            li.classList.add('disabled');
-        } else {
-            li.classList.remove('disabled');
-        }
-        rewardList.appendChild(li);
+      const card = document.createElement('div');
+      card.classList.add('reward-card'); // Add reward-card class for consistent styling
+      const disabled = tokenCount < reward.cost;
+  
+      card.innerHTML = `
+        <h3>🎁 ${reward.name}</h3>
+        <span class="reward-cost">${reward.cost} tokens</span>
+      `;
+  
+      card.dataset.cost = reward.cost;
+      card.dataset.reward = reward.name;
+  
+      if (disabled) {
+        card.classList.add('disabled');
+      } else {
+        card.classList.remove('disabled');
+        card.addEventListener('click', () => {
+          const cost = parseInt(reward.cost);
+          if (tokenCount >= cost) {
+            tokenCount -= cost;
+            updateTokenDisplay();
+            updateTokenJar();
+            logActivity(`Redeemed ${reward.name} for ${cost} tokens`, 'reward');
+            updateRewardDisabledStates();
+            saveData(currentChild);
+            // Optionally, handle the reward redemption logic here
+          }
+        });
+      }
+  
+      container.appendChild(card);
     });
     updateRewardDisabledStates();
-}
+    attachRewardCardListeners(); // Attach event listeners after rendering
+  }
+
+
 function addFilteringControls() {
     // Example: Add a dropdown to filter by behavior type
     const filterDropdown = document.createElement('select');
@@ -424,34 +448,41 @@ function filterBehaviors(type) {
 }
 
 	
- function handleRewardClick(event) {
-        const li = event.target.closest('li');
-        if (!li || li.classList.contains('disabled')) return;
+function handleRewardClick(event) {
+    const card = event.target.closest('.reward-card'); // Target the reward card
+    if (!card || card.classList.contains('disabled')) return;
 
-        const cost = parseInt(li.dataset.cost); 
-        const reward = li.dataset.reward;
+    const cost = parseInt(card.dataset.cost);
+    const reward = card.dataset.reward;
 
-        tokenCount = Math.max(0, tokenCount - cost); // Prevent negative here
-        updateTokenDisplay();
-        logActivity(`Redeemed ${reward} for ${cost} tokens`, 'redemption');
-updateRewardDisabledStates();
-	saveData(currentChild);
-    }
+    tokenCount = Math.max(0, tokenCount - cost); // Prevent negative here
+    updateTokenDisplay();
+    updateTokenJar(); // Update the token jar visual
+    logActivity(`Redeemed ${reward} for ${cost} tokens`, 'redemption');
+    updateRewardDisabledStates();
+    saveData(currentChild);
+}
 
-  function updateRewardDisabledStates() {
-    const rewardItems = rewardList.querySelectorAll('li[data-cost]'); // Select list items with data-cost
-    rewardItems.forEach(item => {
-        const rewardCost = parseInt(item.dataset.cost);
-        console.log('Token Count:', tokenCount, 'Reward Cost:', rewardCost); // Debugging
+function updateRewardDisabledStates() {
+    const rewardCards = document.querySelectorAll('.reward-card[data-cost]'); // Select reward cards with data-cost
+    rewardCards.forEach(card => {
+        const rewardCost = parseInt(card.dataset.cost);
 
         if (tokenCount >= rewardCost) {
-            item.classList.remove('disabled');
+            card.classList.remove('disabled');
         } else {
-            item.classList.add('disabled');
+            card.classList.add('disabled');
         }
     });
 }
-	
+
+// Add this function to attach event listeners to reward cards
+function attachRewardCardListeners() {
+    const rewardCards = document.querySelectorAll('.reward-card:not(.disabled)');
+    rewardCards.forEach(card => {
+        card.addEventListener('click', handleRewardClick);
+    });
+}
     function updateTokenDisplay() {
         tokenDisplay.textContent = tokenCount;
     }
