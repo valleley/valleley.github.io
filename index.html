@@ -26,48 +26,41 @@
             </div>
         </header>
         <div class="btn-group w-100 flex-column flex-md-row mb-3" role="group">
-         <!--   <button type="button" class="btn btn-outline-primary tab active col-md-3" onclick="showTab('dashboard')">Dashboard</button> -->
             <button type="button" class="btn btn-outline-primary tab active col-md-3" onclick="showTab('behaviors')">Behaviors</button>
             <button type="button" class="btn btn-outline-primary tab col-md-3" onclick="showTab('reward')">Rewards</button>
             <button type="button" class="btn btn-outline-primary tab col-md-3" onclick="showTab('log')">Activity Log</button>
             <button type="button" class="btn btn-outline-primary tab col-md-3" onclick="showTab('settings')">Settings</button>
         </div>
 
-       <!--  <div id="dashboard-section" class="tab-content active">
-            <div id="dashboard-content" class="d-flex flex-wrap justify-content-center"></div>
-        </div> -->
-
-   <div id="behaviors-section" class="tab-content content-section active"  style="display: block;">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div id="behavior-cards-container" class="d-flex flex-wrap">
+        <div id="behaviors-section" class="tab-content content-section active" style="display: block;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div id="behavior-cards-container" class="d-flex flex-wrap">
+                        </div>
                     </div>
+                </div>
+            </div>
+            <button id="add-behavior-btn" class="btn btn-success mt-3">Add Behavior</button>
+            <div id="new-behavior-form" class="mt-3" style="display: none;">
+                <h3>Add New Behavior</h3>
+                <input type="text" id="new-behavior-name" class="form-control mb-2" placeholder="Behavior Name">
+                <input type="number" id="new-behavior-value" class="form-control mb-2" placeholder="Token Value">
+                <select id="new-behavior-type" class="form-control mb-2">
+                    <option value="positive">Positive</option>
+                    <option value="negative">Negative</option>
+                    <option value="coindump">Coindump</option>
+                </select>
+                <button id="save-behavior-btn" class="btn btn-primary">Save</button>
+                <button id="cancel-behavior-btn" class="btn btn-secondary">Cancel</button>
             </div>
         </div>
-        </div>
-		</div>
-                <button id="add-behavior-btn" class="btn btn-success mt-3">Add Behavior</button>
-                <div id="new-behavior-form" class="mt-3" style="display: none;">
-                    <h3>Add New Behavior</h3>
-                    <input type="text" id="new-behavior-name" class="form-control mb-2" placeholder="Behavior Name">
-                    <input type="number" id="new-behavior-value" class="form-control mb-2" placeholder="Token Value">
-                    <select id="new-behavior-type" class="form-control mb-2">
-                        <option value="positive">Positive</option>
-                        <option value="negative">Negative</option>
-                        <option value="coindump">Coindump</option>
-                    </select>
-                    <button id="save-behavior-btn" class="btn btn-primary">Save</button>
-                    <button id="cancel-behavior-btn" class="btn btn-secondary">Cancel</button>
-                </div>
-             
 
         <div id="reward-section" class="tab-content">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
-                        <div class="reward-box">
-                            <ul id="reward-list"></ul>
+                        <div id="reward-cards-container" class="d-flex flex-wrap">
                         </div>
                         <button id="add-reward-btn" class="btn btn-success mt-3">Add Reward</button>
                     </div>
@@ -103,7 +96,6 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
