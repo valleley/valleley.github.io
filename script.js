@@ -449,29 +449,30 @@ function filterBehaviors(type) {
 
 	
 function handleRewardClick(event) {
-    const card = event.target.closest('.reward-card'); // Target the reward card
+    const card = event.target.closest('.reward-card');
     if (!card || card.classList.contains('disabled')) return;
 
     const cost = parseInt(card.dataset.cost);
     const reward = card.dataset.reward;
 
-    tokenCount = Math.max(0, tokenCount - cost); // Prevent negative here
+    tokenCount -= cost;
     updateTokenDisplay();
-    updateTokenJar(); // Update the token jar visual
+    updateTokenJar();
     logActivity(`Redeemed ${reward} for ${cost} tokens`, 'redemption');
     updateRewardDisabledStates();
     saveData(currentChild);
 }
 
 function updateRewardDisabledStates() {
-    const rewardCards = document.querySelectorAll('.reward-card[data-cost]'); // Select reward cards with data-cost
+    const rewardCards = document.querySelectorAll('.reward-card[data-cost]');
     rewardCards.forEach(card => {
         const rewardCost = parseInt(card.dataset.cost);
+        const disabled = tokenCount < rewardCost;
 
-        if (tokenCount >= rewardCost) {
-            card.classList.remove('disabled');
-        } else {
+        if (disabled) {
             card.classList.add('disabled');
+        } else {
+            card.classList.remove('disabled');
         }
     });
 }
