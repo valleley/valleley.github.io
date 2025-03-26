@@ -449,30 +449,29 @@ function filterBehaviors(type) {
 
 	
 function handleRewardClick(event) {
-    const card = event.target.closest('.reward-card');
+    const card = event.target.closest('.reward-card'); // Target the reward card
     if (!card || card.classList.contains('disabled')) return;
 
     const cost = parseInt(card.dataset.cost);
     const reward = card.dataset.reward;
 
-    tokenCount -= cost;
+    tokenCount = Math.max(0, tokenCount - cost); // Prevent negative here
     updateTokenDisplay();
-    updateTokenJar();
+    updateTokenJar(); // Update the token jar visual
     logActivity(`Redeemed ${reward} for ${cost} tokens`, 'redemption');
     updateRewardDisabledStates();
     saveData(currentChild);
 }
 
 function updateRewardDisabledStates() {
-    const rewardCards = document.querySelectorAll('.reward-card[data-cost]');
+    const rewardCards = document.querySelectorAll('.reward-card[data-cost]'); // Select reward cards with data-cost
     rewardCards.forEach(card => {
         const rewardCost = parseInt(card.dataset.cost);
-        const disabled = tokenCount < rewardCost;
 
-        if (disabled) {
-            card.classList.add('disabled');
-        } else {
+        if (tokenCount >= rewardCost) {
             card.classList.remove('disabled');
+        } else {
+            card.classList.add('disabled');
         }
     });
 }
@@ -649,6 +648,30 @@ function clearData() {
         tokenCount = Math.max(0, tokenCount - amount); // Prevent negative here
         updateTokenJar();
     }
+	
+	function setupHeadingClick(data, switchChild) {
+  const heading = document.querySelector('h1'); // Select the heading element
+
+  if (heading) {
+    heading.addEventListener('click', () => {
+      // Extract the child's name from the heading text
+      const headingText = heading.textContent;
+      const childName = headingText.split("'s")[0]; // Get the part before "'s"
+
+      // Find the corresponding child in the data
+      const child = data.children.find((c) => c.name === childName);
+
+      if (child) {
+        changeChild(child); // Call the switchChild function with the found child
+      } else {
+        console.error(`Child with name "${childName}" not found.`);
+      }
+    });
+  } else {
+    console.error("Heading element not found.");
+  }
+}
+	
 	
  function setTokenCount(count) {
         tokenCount = count;
