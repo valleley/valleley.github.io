@@ -872,7 +872,19 @@ button:active {
 .reward-card.disabled .reward-cost{
     color: #888;
 }
+  .edit-behavior-btn {
+        background-color: #ffc107; /* A yellow color */
+        color: #212529; /* Dark text */
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.8em;
+    }
 
+    .edit-behavior-btn:hover {
+        background-color: #ffca2b;
+    }
 
 .filter-buttons {
   display: flex;
