@@ -374,7 +374,7 @@ function renderActivityLog() {
         card.addEventListener('click', (event) => {
             if (!event.target.classList.contains('edit-behavior-btn')) { // Check if the click was NOT on the edit button
                 const tokens = parseInt(behavior.value);
-                const message = `${behavior.name}: <span class="math-inline">\{tokens \> 0 ? '\+' \: ''\}</span>{tokens} tokens`;
+                const message = `${behavior.name}: ${tokens > 0 ? '+' : ''}${tokens} tokens`;
                 tokenCount = Math.max(0, tokenCount + tokens);
                 updateTokenDisplay();
                 updateTokenJar();
