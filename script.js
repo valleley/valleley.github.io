@@ -333,7 +333,6 @@ function saveData(child) {
             return Promise.reject("Data or data.record is missing."); // Return a rejected promise
         }
     });
-}
 function renderActivityLog() {
         if (Array.isArray(activityLog)) {
             activityLogElement.innerHTML = ''; // Clear the list before rendering
