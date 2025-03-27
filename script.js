@@ -54,7 +54,49 @@ document.addEventListener('DOMContentLoaded', function () {
 	const apiKey = '$2a$10$X5Qc9AS17LVgJPMzQWkaTeAGpfrUD7gzUBoVHRY2z6HiaZd1o7.t6'; // Replace with your API key
 	const apiUrl = `https://api.jsonbin.io/v3/b/${binId}`;
    
+  // Add debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
+// Debounced version of saveData
+const debouncedSaveData = debounce((child) => {
+    fetch(apiUrl, {
+        headers: {
+            'X-Master-Key': apiKey
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.record) {
+            data.record[child] = {
+                behaviors: behaviors,
+                tokenCount: tokenCount,
+                activityLog: activityLog,
+                rewards: rewards
+            };
+            return fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': apiKey
+                },
+                body: JSON.stringify(data.record)
+            });
+        } else {
+            console.error("Data or data.record is missing from API response.");
+            return Promise.reject("Data or data.record is missing.");
+        }
+    });
+}, 2000); // 2 second delay
 
   
    // --------------------------------------------------
@@ -289,55 +331,6 @@ function loadData(child) {
             console.error('Error loading data:', error);
             console.log('Error object:', error);
         });
-}
-
-// Add debounce function
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Debounced version of saveData
-const debouncedSaveData = debounce((child) => {
-    fetch(apiUrl, {
-        headers: {
-            'X-Master-Key': apiKey
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data && data.record) {
-            data.record[child] = {
-                behaviors: behaviors,
-                tokenCount: tokenCount,
-                activityLog: activityLog,
-                rewards: rewards
-            };
-            return fetch(apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': apiKey
-                },
-                body: JSON.stringify(data.record)
-            });
-        } else {
-            console.error("Data or data.record is missing from API response.");
-            return Promise.reject("Data or data.record is missing.");
-        }
-    });
-}, 2000); // 2 second delay
-
-// Replace the original saveData function with the debounced version
-function saveData(child) {
-    debouncedSaveData(child);
 }
 
 function renderActivityLog() {
