@@ -221,6 +221,18 @@ saveBehaviorBtn.addEventListener('click', () => {
         }
     });
 
+	function attachEditBehaviorListeners() {
+    const editButtons = document.querySelectorAll('.edit-behavior-btn');
+    editButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const behaviorId = event.target.dataset.id;
+            const behaviorToEdit = behaviors.find(behavior => behavior.id.toString() === behaviorId);
+            if (behaviorToEdit) {
+                showEditBehaviorForm(behaviorToEdit);
+            }
+        });
+    });
+}
     // --------------------------------------------------
     //  Functions
     // --------------------------------------------------
@@ -347,33 +359,36 @@ function renderActivityLog() {
             });
         }
     }
-   function renderBehaviors() {
+   renderBehaviors() {
     const container = document.getElementById('behavior-cards-container');
     container.innerHTML = ''; // Clear existing cards
 
     behaviors.forEach(behavior => {
         const card = document.createElement('div');
-        card.classList.add('behavior-card', behavior.type); // Add type as a class for styling
+        card.classList.add('behavior-card', behavior.type);
         card.innerHTML = `
-            <h3>${behavior.name}</h3>
-            <span class="behavior-value">${behavior.value} tokens</span>
-        `;
+            <h3><span class="math-inline">\{behavior\.name\}</h3\>
+<span class="behavior-value">{behavior.value} tokens</span>
+<button class="edit-behavior-btn" data-id="${behavior.id}">Edit</button>  `;
 
-        // Add event listener for behavior click
-        card.addEventListener('click', () => {
-            const tokens = parseInt(behavior.value);
-            const message = `${behavior.name}: ${tokens > 0 ? '+' : ''}${tokens} tokens`;
-            tokenCount = Math.max(0, tokenCount + tokens);
-            updateTokenDisplay();
-            updateTokenJar();
-            logActivity(message, behavior.type);
-            updateRewardDisabledStates();
-            saveData(currentChild);
+        // Add event listener for behavior click (existing functionality)
+        card.addEventListener('click', (event) => {
+            if (!event.target.classList.contains('edit-behavior-btn')) { // Check if the click was NOT on the edit button
+                const tokens = parseInt(behavior.value);
+                const message = `${behavior.name}: <span class="math-inline">\{tokens \> 0 ? '\+' \: ''\}</span>{tokens} tokens`;
+                tokenCount = Math.max(0, tokenCount + tokens);
+                updateTokenDisplay();
+                updateTokenJar();
+                logActivity(message, behavior.type);
+                updateRewardDisabledStates();
+                saveData(currentChild);
+            }
         });
 
         container.appendChild(card);
     });
-   }
+    attachEditBehaviorListeners(); // Call the function to attach event listeners to the new edit buttons
+}
 
    function renderRewards() {
     const container = document.getElementById('reward-cards-container'); // Assuming you have a container for rewards
@@ -445,6 +460,45 @@ function filterBehaviors(type) {
             card.style.display = 'none';
         }
     });
+}
+
+function showEditBehaviorForm(behavior) {
+    const formContainer = document.getElementById('new-behavior-form'); // Assuming you'll reuse this form
+    formContainer.style.display = 'block'; // Show the form
+
+    // Populate the form fields with the behavior's data
+    document.getElementById('new-behavior-name').value = behavior.name;
+    document.getElementById('new-behavior-value').value = behavior.value;
+    document.getElementById('new-behavior-type').value = behavior.type;
+
+    // Change the Save button's functionality
+    const saveButton = document.getElementById('save-behavior-btn');
+    saveButton.onclick = () => {
+        // Update the behavior in the behaviors array
+        behavior.name = document.getElementById('new-behavior-name').value;
+        behavior.value = parseInt(document.getElementById('new-behavior-value').value);
+        behavior.type = document.getElementById('new-behavior-type').value;
+
+        renderBehaviors(); // Re-render the list to show the updated behavior
+        formContainer.style.display = 'none'; // Hide the form
+        saveData(currentChild); // Save the updated data
+
+        // Reset the Save button's onclick
+        saveButton.onclick = () => {
+            // Original save functionality here, if needed
+        };
+    };
+
+    // Change the Cancel button's functionality
+    const cancelButton = document.getElementById('cancel-behavior-btn');
+    cancelButton.onclick = () => {
+        formContainer.style.display = 'none'; // Hide the form
+
+        // Reset the Cancel button's onclick
+        cancelButton.onclick = () => {
+            // Original cancel functionality here
+        };
+    };
 }
 
 	
