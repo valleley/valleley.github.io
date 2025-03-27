@@ -1,3 +1,678 @@
+Recent
+Edit button implementation assistance
+Moody, atmospheric, photorealistic image capturing an MQ-9 Reaper drone gliding over Philadelphia during twilight. The iconic city skyline is silhouetted or subtly lit below. The drone itself is sharply detailed, featuring the letters "PA" distinctly marked on its tail fin. Artistic composition, dramatic cloudscape, high resolution. --ar 3:2 --style raw --v 6.0
+MQ-9 Reaper Coloring Page
+Coloring Book Image Prompt
+Displaying Behaviors and Rewards
+
+More
+Gems
+
+Coding partner
+
+
+Writing editor
+
+
+Chess champ
+
+
+More
+
+Gem manager
+
+Help
+
+Activity
+
+Settings
+Pennsylvania, USA
+Based on your places (Home) • Update location 
+Conversation with Gemini
+I want to make an edit button that pops up a form to edit whichever item i select.
+
+
+script
+JS
+
+style
+CSS
+
+index.html
+HTML
+
+Coding partner
+
+Analysis
+I can certainly help you with that! Here's a breakdown of how we can create an edit button for your items, along with the code and explanations:
+
+Explanation
+
+The approach involves adding an edit button to each item's display. When clicked, this button will:
+
+Display a form populated with the item's current data.
+Allow the user to modify the data.
+Save the updated data.
+Here's how we'll implement this for the "Behaviors" section. The "Rewards" section would follow a very similar pattern.
+
+Implementation for Behaviors
+
+1.  Modify renderBehaviors() to include the Edit Button
+
+```javascript
+function renderBehaviors() {
+    const container = document.getElementById('behavior-cards-container');
+    container.innerHTML = ''; // Clear existing cards
+
+    behaviors.forEach(behavior => {
+        const card = document.createElement('div');
+        card.classList.add('behavior-card', behavior.type);
+        card.innerHTML = `
+            <h3><span class="math-inline">\{behavior\.name\}</h3\>
+<span class="behavior-value">{behavior.value} tokens</span>
+<button class="edit-behavior-btn" data-id="${behavior.id}">Edit</button>  `;
+
+        // Add event listener for behavior click (existing functionality)
+        card.addEventListener('click', (event) => {
+            if (!event.target.classList.contains('edit-behavior-btn')) { // Check if the click was NOT on the edit button
+                const tokens = parseInt(behavior.value);
+                const message = `${behavior.name}: <span class="math-inline">\{tokens \> 0 ? '\+' \: ''\}</span>{tokens} tokens`;
+                tokenCount = Math.max(0, tokenCount + tokens);
+                updateTokenDisplay();
+                updateTokenJar();
+                logActivity(message, behavior.type);
+                updateRewardDisabledStates();
+                saveData(currentChild);
+            }
+        });
+
+        container.appendChild(card);
+    });
+    attachEditBehaviorListeners(); // Call the function to attach event listeners to the new edit buttons
+}
+```
+
+* We've added a button element with the class `edit-behavior-btn` to each behavior card.
+* The `data-id` attribute is crucial; it stores the unique ID of the behavior, allowing us to identify which behavior to edit later.
+* We’ve modified the existing click event listener to check if the target of the click was the edit button. If it wasn’t, we proceed with the existing functionality.
+* We call a new function `attachEditBehaviorListeners()` after rendering the behaviors. This function will attach the event listeners to the edit buttons.
+2.  Create the attachEditBehaviorListeners() Function
+
+```javascript
+function attachEditBehaviorListeners() {
+    const editButtons = document.querySelectorAll('.edit-behavior-btn');
+    editButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const behaviorId = event.target.dataset.id;
+            const behaviorToEdit = behaviors.find(behavior => behavior.id.toString() === behaviorId);
+            if (behaviorToEdit) {
+                showEditBehaviorForm(behaviorToEdit);
+            }
+        });
+    });
+}
+```
+
+* This function selects all elements with the class `edit-behavior-btn`.
+* It then iterates through each button and adds a click event listener.
+* Inside the event listener:
+    * We extract the `behaviorId` from the `data-id` attribute of the clicked button.
+    * We use the `find` method to locate the behavior in the `behaviors` array that matches the `behaviorId`.
+    * If a matching behavior is found, we call `showEditBehaviorForm()` to display the edit form.
+3.  Create the showEditBehaviorForm() Function
+
+```javascript
+function showEditBehaviorForm(behavior) {
+    const formContainer = document.getElementById('new-behavior-form'); // Assuming you'll reuse this form
+    formContainer.style.display = 'block'; // Show the form
+
+    // Populate the form fields with the behavior's data
+    document.getElementById('new-behavior-name').value = behavior.name;
+    document.getElementById('new-behavior-value').value = behavior.value;
+    document.getElementById('new-behavior-type').value = behavior.type;
+
+    // Change the Save button's functionality
+    const saveButton = document.getElementById('save-behavior-btn');
+    saveButton.onclick = () => {
+        // Update the behavior in the behaviors array
+        behavior.name = document.getElementById('new-behavior-name').value;
+        behavior.value = parseInt(document.getElementById('new-behavior-value').value);
+        behavior.type = document.getElementById('new-behavior-type').value;
+
+        renderBehaviors(); // Re-render the list to show the updated behavior
+        formContainer.style.display = 'none'; // Hide the form
+        saveData(currentChild); // Save the updated data
+
+        // Reset the Save button's onclick
+        saveButton.onclick = () => {
+            // Original save functionality here, if needed
+        };
+    };
+
+    // Change the Cancel button's functionality
+    const cancelButton = document.getElementById('cancel-behavior-btn');
+    cancelButton.onclick = () => {
+        formContainer.style.display = 'none'; // Hide the form
+
+        // Reset the Cancel button's onclick
+        cancelButton.onclick = () => {
+            // Original cancel functionality here
+        };
+    };
+}
+```
+
+* This function takes the `behavior` object as an argument.
+* It shows the behavior form (`new-behavior-form`).
+* It populates the form's input fields with the current data of the behavior.
+* It modifies the `onclick` event handler of the "Save" button to:
+    * Update the corresponding behavior in the `behaviors` array with the new values from the form.
+    * Re-render the behavior list to reflect the changes.
+    * Hide the form.
+    * Save the updated data.
+* It modifies the `onclick` event handler of the "Cancel" button to hide the form.
+4.  (Optional) Visual Updates
+
+* You might want to visually distinguish the edit button. Add some CSS:
+
+    ```css
+    .edit-behavior-btn {
+        background-color: #ffc107; /* A yellow color */
+        color: #212529; /* Dark text */
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 0.8em;
+    }
+
+    .edit-behavior-btn:hover {
+        background-color: #ffca2b;
+    }
+    ```
+Important Considerations
+
+Reusing the Form: This code reuses your existing new-behavior-form. If you need a separate form for editing, you'll need to create a new HTML element for it.
+Error Handling: You might want to add error handling (e.g., validating user input in the edit form).
+Rewards Section: Apply the same pattern to the "Rewards" section. You'll need to adjust the function names and the IDs of the elements accordingly.
+Let me know if you'd like me to help you adapt this code for the Rewards section or if you have any other questions!
+
+
+Sources and related content
+script
+
+JS
+style
+
+CSS
+index.html
+
+HTML
+
+
+
+
+   renderBehaviors() {
+
+    const container = document.getElementById('behavior-cards-container');
+
+    container.innerHTML = ''; // Clear existing cards
+
+
+
+    behaviors.forEach(behavior => {
+
+        const card = document.createElement('div');
+
+        card.classList.add('behavior-card', behavior.type);
+
+        card.innerHTML = `
+
+            <h3><span class="math-inline">\{behavior\.name\}</h3\>
+
+<span class="behavior-value">{behavior.value} tokens</span>
+
+<button class="edit-behavior-btn" data-id="${behavior.id}">Edit</button>  `;
+
+
+
+        // Add event listener for behavior click (existing functionality)
+
+        card.addEventListener('click', (event) => {
+
+            if (!event.target.classList.contains('edit-behavior-btn')) { // Check if the click was NOT on the edit button
+
+                const tokens = parseInt(behavior.value);
+
+                const message = `${behavior.name}: <span class="math-inline">\{tokens \> 0 ? '\+' \: ''\}</span>{tokens} tokens`;
+
+                tokenCount = Math.max(0, tokenCount + tokens);
+
+                updateTokenDisplay();
+
+                updateTokenJar();
+
+                logActivity(message, behavior.type);
+
+                updateRewardDisabledStates();
+
+                saveData(currentChild);
+
+            }
+
+        });
+
+
+
+        container.appendChild(card);
+
+    });
+
+    attachEditBehaviorListeners(); // Call the function to attach event listeners to the new edit buttons
+
+}
+
+
+
+is there a bracket error here
+
+
+
+Coding partner
+Yes, there is a bracket error in the code you provided.
+
+Specifically, this line:
+
+JavaScript
+
+const message = `${behavior.name}: <span class="math-inline">\{tokens > 0 ? '+' : ''\}</span>{tokens} tokens`;
+has an extra set of curly braces inside the <span> tag.
+
+Here's the corrected line:
+
+JavaScript
+
+const message = `${behavior.name}: ${tokens > 0 ? '+' : ''}${tokens} tokens`;
+Explanation of the Error and Correction
+
+Template Literals: The backticks (`) are used for template literals in JavaScript, which allow you to embed expressions directly within strings using ${expression}.
+Unnecessary Curly Braces: The original code had \{tokens > 0 ? '+' : ''\} within the <span> tag. The curly braces around the ternary operator (tokens > 0 ? '+' : '') are only needed inside the template literal (i.e., within the ${...}). The <span> tag itself doesn't interpret JavaScript expressions.
+Corrected Code: The corrected code removes the extra curly braces, leaving only ${tokens > 0 ? '+' : ''} inside the template literal. This correctly embeds the result of the ternary operator (either "+" or "") into the string.
+With this correction, the code should function as intended.
+
+
+Sources and related content
+script
+
+JS
+style
+
+CSS
+index.html
+
+HTML
+
+
+
+
+
+function renderActivityLog() {
+
+        if (Array.isArray(activityLog)) {
+
+            activityLogElement.innerHTML = ''; // Clear the list before rendering
+
+            activityLog.forEach(log => {
+
+                const listItem = document.createElement('li');
+
+                listItem.textContent = log.message;
+
+
+
+                switch (log.type) {
+
+                    case 'positive':
+
+                        listItem.style.color = 'green';
+
+                        break;
+
+                    case 'negative':
+
+                        listItem.style.color = 'red';
+
+                        break;
+
+                    case 'redemption':
+
+                        listItem.style.color = 'blue';
+
+                        break;
+
+                    default:
+
+                        listItem.style.color = 'black';
+
+                }
+
+
+
+                activityLogElement.prepend(listItem); // Use the DOM element
+
+            });
+
+        }
+
+    }
+
+   renderBehaviors() {
+
+    const container = document.getElementById('behavior-cards-container');
+
+    container.innerHTML = ''; // Clear existing cards
+
+
+
+    behaviors.forEach(behavior => {
+
+        const card = document.createElement('div');
+
+        card.classList.add('behavior-card', behavior.type);
+
+        card.innerHTML = `
+
+            <h3><span class="math-inline">\{behavior\.name\}</h3\>
+
+<span class="behavior-value">{behavior.value} tokens</span>
+
+<button class="edit-behavior-btn" data-id="${behavior.id}">Edit</button>  `;
+
+
+
+        // Add event listener for behavior click (existing functionality)
+
+        card.addEventListener('click', (event) => {
+
+            if (!event.target.classList.contains('edit-behavior-btn')) { // Check if the click was NOT on the edit button
+
+                const tokens = parseInt(behavior.value);
+
+                const message = `${behavior.name}: ${tokens > 0 ? '+' : ''}${tokens} tokens`;
+
+                tokenCount = Math.max(0, tokenCount + tokens);
+
+                updateTokenDisplay();
+
+                updateTokenJar();
+
+                logActivity(message, behavior.type);
+
+                updateRewardDisabledStates();
+
+                saveData(currentChild);
+
+            }
+
+        });
+
+
+
+        container.appendChild(card);
+
+    });
+
+    attachEditBehaviorListeners(); // Call the function to attach event listeners to the new edit buttons
+
+}
+
+
+
+   function renderRewards() {
+
+    const container = document.getElementById('reward-cards-container'); // Assuming you have a container for rewards
+
+    container.innerHTML = '';
+
+  
+
+    rewards.forEach(reward => {
+
+      const card = document.createElement('div');
+
+      card.classList.add('reward-card'); // Add reward-card class for consistent styling
+
+      const disabled = tokenCount < reward.cost;
+
+  
+
+      card.innerHTML = `
+
+        <h3>🎁 ${reward.name}</h3>
+
+        <span class="reward-cost">${reward.cost} tokens</span>
+
+      `;
+
+  
+
+      card.dataset.cost = reward.cost;
+
+      card.dataset.reward = reward.name;
+
+  
+
+      if (disabled) {
+
+        card.classList.add('disabled');
+
+      } else {
+
+        card.classList.remove('disabled');
+
+        card.addEventListener('click', () => {
+
+          const cost = parseInt(reward.cost);
+
+          if (tokenCount >= cost) {
+
+            tokenCount -= cost;
+
+            updateTokenDisplay();
+
+            updateTokenJar();
+
+            logActivity(`Redeemed ${reward.name} for ${cost} tokens`, 'reward');
+
+            updateRewardDisabledStates();
+
+            saveData(currentChild);
+
+            // Optionally, handle the reward redemption logic here
+
+          }
+
+        });
+
+      }
+
+  
+
+      container.appendChild(card);
+
+    });
+
+    updateRewardDisabledStates();
+
+    attachRewardCardListeners(); // Attach event listeners after rendering
+
+  }
+
+
+
+
+
+any extra brackets?
+
+
+
+Coding partner
+
+Analysis
+Let's analyze the code you've provided for any extra brackets or other syntax issues.
+
+renderActivityLog()
+
+JavaScript
+
+function renderActivityLog() {
+    if (Array.isArray(activityLog)) {
+        activityLogElement.innerHTML = ''; // Clear the list before rendering
+        activityLog.forEach(log => {
+            const listItem = document.createElement('li');
+            listItem.textContent = log.message;
+
+            switch (log.type) {
+                case 'positive':
+                    listItem.style.color = 'green';
+                    break;
+                case 'negative':
+                    listItem.style.color = 'red';
+                    break;
+                case 'redemption':
+                    listItem.style.color = 'blue';
+                    break;
+                default:
+                    listItem.style.color = 'black';
+                }
+
+                activityLogElement.prepend(listItem); // Use the DOM element
+            });
+        }
+    }
+}
+This function looks fine. There are no extra brackets or obvious syntax errors.
+renderBehaviors()
+
+JavaScript
+
+function renderBehaviors() {
+    const container = document.getElementById('behavior-cards-container');
+    container.innerHTML = ''; // Clear existing cards
+
+    behaviors.forEach(behavior => {
+        const card = document.createElement('div');
+        card.classList.add('behavior-card', behavior.type);
+        card.innerHTML = `
+            <h3><span class="math-inline">\{behavior\.name\}</span></h3>
+            <span class="behavior-value">{behavior.value} tokens</span>
+            <button class="edit-behavior-btn" data-id="${behavior.id}">Edit</button>  
+        `;
+
+        // Add event listener for behavior click (existing functionality)
+        card.addEventListener('click', (event) => {
+            if (!event.target.classList.contains('edit-behavior-btn')) { // Check if the click was NOT on the edit button
+                const tokens = parseInt(behavior.value);
+                const message = `${behavior.name}: ${tokens > 0 ? '+' : ''}${tokens} tokens`;
+                tokenCount = Math.max(0, tokenCount + tokens);
+                updateTokenDisplay();
+                updateTokenJar();
+                logActivity(message, behavior.type);
+                updateRewardDisabledStates();
+                saveData(currentChild);
+            }
+        });
+
+        container.appendChild(card);
+    });
+    attachEditBehaviorListeners(); // Call the function to attach event listeners to the new edit buttons
+}
+As we identified before, there are misplaced curly braces within the template literal in this line:
+
+JavaScript
+
+card.innerHTML = `
+    <h3><span class="math-inline">\{behavior\.name\}</span></h3>
+    <span class="behavior-value">{behavior.value} tokens</span>
+    <button class="edit-behavior-btn" data-id="${behavior.id}">Edit</button>
+`;
+It should be corrected to:
+
+JavaScript
+
+card.innerHTML = `
+    <h3><span class="math-inline">\{behavior\.name\}</h3\>
+<span class="behavior-value">{behavior.value} tokens</span>
+<button class="edit-behavior-btn" data-id="${behavior.id}">Edit</button>
+`;
+```
+
+renderRewards()
+
+JavaScript
+
+function renderRewards() {
+    const container = document.getElementById('reward-cards-container'); // Assuming you have a container for rewards
+    container.innerHTML = '';
+
+    rewards.forEach(reward => {
+        const card = document.createElement('div');
+        card.classList.add('reward-card'); // Add reward-card class for consistent styling
+        const disabled = tokenCount < reward.cost;
+
+        card.innerHTML = `
+            <h3>🎁 ${reward.name}</h3>
+            <span class="reward-cost">${reward.cost} tokens</span>
+        `;
+
+        card.dataset.cost = reward.cost;
+        card.dataset.reward = reward.name;
+
+        if (disabled) {
+            card.classList.add('disabled');
+        } else {
+            card.classList.remove('disabled');
+            card.addEventListener('click', () => {
+                const cost = parseInt(reward.cost);
+                if (tokenCount >= cost) {
+                    tokenCount -= cost;
+                    updateTokenDisplay();
+                    updateTokenJar();
+                    logActivity(`Redeemed ${reward.name} for ${cost} tokens`, 'reward');
+                    updateRewardDisabledStates();
+                    saveData(currentChild);
+                    // Optionally, handle the reward redemption logic here
+                }
+            });
+        }
+
+        container.appendChild(card);
+    });
+    updateRewardDisabledStates();
+    attachRewardCardListeners(); // Attach event listeners after rendering
+}
+This function also looks correct, with no extra brackets or syntax errors.
+Summary of Bracket Errors
+
+The only bracket error is in the renderBehaviors() function, specifically in the card.innerHTML template literal.
+
+
+Sources and related content
+script
+
+JS
+
+
+
+
+
+
+
+
+
+
+Gemini can make mistakes, so double-check it
+
 function showTab(tab) {
     const allTabs = document.querySelectorAll('.tab-content');
     const allTabButtons = document.querySelectorAll('.tab');
@@ -221,29 +896,16 @@ saveBehaviorBtn.addEventListener('click', () => {
         }
     });
 
-	function attachEditBehaviorListeners() {
-    const editButtons = document.querySelectorAll('.edit-behavior-btn');
-    editButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            const behaviorId = event.target.dataset.id;
-            const behaviorToEdit = behaviors.find(behavior => behavior.id.toString() === behaviorId);
-            if (behaviorToEdit) {
-                showEditBehaviorForm(behaviorToEdit);
-            }
-        });
-    });
-}
     // --------------------------------------------------
     //  Functions
     // --------------------------------------------------
 
     function changeChild(child) {
-        saveData(currentChild).then(() => {
-            currentChild = child;
-            loadData(currentChild);
-   //         createDashboardContent();
-	    updateHeading();
-        });
+        // Save current child's data before switching
+        saveData(currentChild);
+        currentChild = child;
+        loadData(currentChild);
+        updateHeading();
     }
 	    function updateHeading() {
         document.querySelector('.header h1').textContent = `${selectedChild}'s Token Rewards`;
@@ -304,22 +966,36 @@ function loadData(child) {
         });
 }
 
-function saveData(child) {
-    return fetch(apiUrl, { // Return the fetch promise
+// Add debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Debounced version of saveData
+const debouncedSaveData = debounce((child) => {
+    fetch(apiUrl, {
         headers: {
             'X-Master-Key': apiKey
         }
     })
     .then(response => response.json())
     .then(data => {
-        if (data && data.record) { // Check if data and data.record exist
+        if (data && data.record) {
             data.record[child] = {
                 behaviors: behaviors,
                 tokenCount: tokenCount,
                 activityLog: activityLog,
                 rewards: rewards
             };
-            return fetch(apiUrl, { // Return the fetch promise
+            return fetch(apiUrl, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -328,11 +1004,17 @@ function saveData(child) {
                 body: JSON.stringify(data.record)
             });
         } else {
-            // Handle the case where data or data.record is missing
             console.error("Data or data.record is missing from API response.");
-            return Promise.reject("Data or data.record is missing."); // Return a rejected promise
+            return Promise.reject("Data or data.record is missing.");
         }
     });
+}, 2000); // 2 second delay
+
+// Replace the original saveData function with the debounced version
+function saveData(child) {
+    debouncedSaveData(child);
+}
+
 function renderActivityLog() {
         if (Array.isArray(activityLog)) {
             activityLogElement.innerHTML = ''; // Clear the list before rendering
@@ -358,36 +1040,33 @@ function renderActivityLog() {
             });
         }
     }
-   renderBehaviors() {
+   function renderBehaviors() {
     const container = document.getElementById('behavior-cards-container');
     container.innerHTML = ''; // Clear existing cards
 
     behaviors.forEach(behavior => {
         const card = document.createElement('div');
-        card.classList.add('behavior-card', behavior.type);
+        card.classList.add('behavior-card', behavior.type); // Add type as a class for styling
         card.innerHTML = `
-            <h3><span class="math-inline">\{behavior\.name\}</h3\>
-<span class="behavior-value">{behavior.value} tokens</span>
-<button class="edit-behavior-btn" data-id="${behavior.id}">Edit</button>  `;
+            <h3>${behavior.name}</h3>
+            <span class="behavior-value">${behavior.value} tokens</span>
+        `;
 
-        // Add event listener for behavior click (existing functionality)
-        card.addEventListener('click', (event) => {
-            if (!event.target.classList.contains('edit-behavior-btn')) { // Check if the click was NOT on the edit button
-                const tokens = parseInt(behavior.value);
-                const message = `${behavior.name}: ${tokens > 0 ? '+' : ''}${tokens} tokens`;
-                tokenCount = Math.max(0, tokenCount + tokens);
-                updateTokenDisplay();
-                updateTokenJar();
-                logActivity(message, behavior.type);
-                updateRewardDisabledStates();
-                saveData(currentChild);
-            }
+        // Add event listener for behavior click
+        card.addEventListener('click', () => {
+            const tokens = parseInt(behavior.value);
+            const message = `${behavior.name}: ${tokens > 0 ? '+' : ''}${tokens} tokens`;
+            tokenCount = Math.max(0, tokenCount + tokens);
+            updateTokenDisplay();
+            updateTokenJar();
+            logActivity(message, behavior.type);
+            updateRewardDisabledStates();
+            saveData(currentChild);
         });
 
         container.appendChild(card);
     });
-    attachEditBehaviorListeners(); // Call the function to attach event listeners to the new edit buttons
-}
+   }
 
    function renderRewards() {
     const container = document.getElementById('reward-cards-container'); // Assuming you have a container for rewards
@@ -461,56 +1140,17 @@ function filterBehaviors(type) {
     });
 }
 
-function showEditBehaviorForm(behavior) {
-    const formContainer = document.getElementById('new-behavior-form'); // Assuming you'll reuse this form
-    formContainer.style.display = 'block'; // Show the form
-
-    // Populate the form fields with the behavior's data
-    document.getElementById('new-behavior-name').value = behavior.name;
-    document.getElementById('new-behavior-value').value = behavior.value;
-    document.getElementById('new-behavior-type').value = behavior.type;
-
-    // Change the Save button's functionality
-    const saveButton = document.getElementById('save-behavior-btn');
-    saveButton.onclick = () => {
-        // Update the behavior in the behaviors array
-        behavior.name = document.getElementById('new-behavior-name').value;
-        behavior.value = parseInt(document.getElementById('new-behavior-value').value);
-        behavior.type = document.getElementById('new-behavior-type').value;
-
-        renderBehaviors(); // Re-render the list to show the updated behavior
-        formContainer.style.display = 'none'; // Hide the form
-        saveData(currentChild); // Save the updated data
-
-        // Reset the Save button's onclick
-        saveButton.onclick = () => {
-            // Original save functionality here, if needed
-        };
-    };
-
-    // Change the Cancel button's functionality
-    const cancelButton = document.getElementById('cancel-behavior-btn');
-    cancelButton.onclick = () => {
-        formContainer.style.display = 'none'; // Hide the form
-
-        // Reset the Cancel button's onclick
-        cancelButton.onclick = () => {
-            // Original cancel functionality here
-        };
-    };
-}
-
 	
 function handleRewardClick(event) {
-    const card = event.target.closest('.reward-card'); // Target the reward card
+    const card = event.target.closest('.reward-card');
     if (!card || card.classList.contains('disabled')) return;
 
     const cost = parseInt(card.dataset.cost);
     const reward = card.dataset.reward;
 
-    tokenCount = Math.max(0, tokenCount - cost); // Prevent negative here
+    tokenCount = Math.max(0, tokenCount - cost);
     updateTokenDisplay();
-    updateTokenJar(); // Update the token jar visual
+    updateTokenJar();
     logActivity(`Redeemed ${reward} for ${cost} tokens`, 'redemption');
     updateRewardDisabledStates();
     saveData(currentChild);
@@ -579,18 +1219,8 @@ function attachRewardCardListeners() {
                 listItem.style.color = 'black';
         }
 
-        activityLogElement.prepend(listItem); // Use the DOM element
-
+        activityLogElement.prepend(listItem);
         activityLog.push({ timestamp, message: logMessage, type });
-
-   //     createDashboardContent();
-        saveData(currentChild)
-            .then(() => {
-                console.log("Save successful after log activity");
-            })
-            .catch((error) => {
-                console.error("Save failed after log activity", error);
-            });
     }
 
 
@@ -702,30 +1332,6 @@ function clearData() {
         updateTokenJar();
     }
 	
-	function setupHeadingClick(data, switchChild) {
-  const heading = document.querySelector('h1'); // Select the heading element
-
-  if (heading) {
-    heading.addEventListener('click', () => {
-      // Extract the child's name from the heading text
-      const headingText = heading.textContent;
-      const childName = headingText.split("'s")[0]; // Get the part before "'s"
-
-      // Find the corresponding child in the data
-      const child = data.children.find((c) => c.name === childName);
-
-      if (child) {
-        changeChild(child); // Call the switchChild function with the found child
-      } else {
-        console.error(`Child with name "${childName}" not found.`);
-      }
-    });
-  } else {
-    console.error("Heading element not found.");
-  }
-}
-	
-	
  function setTokenCount(count) {
         tokenCount = count;
         console.log('Token count set to:', count); // Log the updated token count
@@ -760,3 +1366,5 @@ function clearData() {
         }
     }
 });
+script.js
+Displaying script.js.
